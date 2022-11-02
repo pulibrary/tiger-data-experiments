@@ -7,5 +7,7 @@ mv python-mfclient mfclient
 
 And then the example should run if appropriate envvars are provided:
 ```
-MF_USERNAME=... MF_PASSWORD=... example.py
+MF_HOST=... MF_DOMAIN=... MF_USERNAME=... MF_PASSWORD=... \
+PYTHONPATH=python-mfclient/src/:$PYTHONPATH \
+./example.py
 ```
