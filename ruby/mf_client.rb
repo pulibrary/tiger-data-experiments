@@ -9,14 +9,30 @@ class MFClient
     @mf_password = mf_password
   end
 
-  def call(service_name, *xml_args, session: nil)
-    session_attr = session ? %Q{session="#{session}"} : ''
+  def call(service_name, *xml_args)
+    session_attr = @session ? %Q{session="#{@session}"} : ''
     request_xml = %Q{<request>
       <service name="#{service_name}" #{session_attr}>
         <args>#{xml_args.join()}</args>
       </service>
     </request>}
     post(request_xml)
+  end
+
+  def session()
+    response_doc = self.call("system.logon",
+      "<domain>#{@mf_domain}</domain>",
+      "<user>#{@mf_username}</user>",
+      "<password>#{@mf_password}</password>",
+    )
+    @session = response_doc.elements["response/reply/result/session"].text
+    # Note: "reply/result" are not in the docs
+
+    response_doc = self.call("asset.namespace.list")
+    puts response_doc
+
+    response_doc = self.call("system.logoff")
+    puts response_doc
   end
 
   private
