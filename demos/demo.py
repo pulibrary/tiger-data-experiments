@@ -14,16 +14,23 @@
 #   # update the MF_HOST, MF_DOMAIN, MF_USER, and MF_PASSWORD values in demo.py
 #   python3 demo.py
 #
+# Examples:
+#   python3 demo.py create
+#   python3 demo.py get 1234
+#   python3 demo.py update 1234
+#
 import datetime
 import re
 import mfclient
+import os
+import sys
 
 MF_PORT=443
 MF_TRANSPORT='https'
-MF_HOST='...'
-MF_DOMAIN='...'
-MF_USER='...'
-MF_PASSWORD='...'
+MF_HOST=os.environ.get('MF_HOST', "your-host")
+MF_DOMAIN=os.environ.get('MF_DOMAIN', "your-domain")
+MF_USER=os.environ.get('MF_USER', "your-user")
+MF_PASSWORD=os.environ.get('MF_PASSWORD', "your-password")
 
 def create_asset(connection, name, namespace, note):
     """ Create an asset with specified name in the given namespace.
@@ -111,47 +118,55 @@ def set_asset_metadata(connection, asset_id, new_name, new_note):
 
 
 if __name__ == '__main__':
+
+    action = "help" if len(sys.argv) == 1 else sys.argv[1]
+    asset_id = 0 if len(sys.argv) < 3 else sys.argv[2]
+
     # create connection object
     connection = mfclient.MFConnection(host=MF_HOST, port=MF_PORT, transport=MF_TRANSPORT, domain=MF_DOMAIN,
                                        user=MF_USER, password=MF_PASSWORD)
     try:
         # connect to mediaflux server
+        print("Connecting to " + MF_HOST + " domain " + MF_DOMAIN + " as user " + MF_USER)
         connection.open()
 
-        # run server.version service
-        result = connection.execute('server.version')
-
-        # print result xml
-        print("== MediaFlux version information XML == ")
-        print(result)
-
-        # print Mediaflux server version
-        print("== MediaFlux version number ==")
-        print(result.value('version'))
-
-        # Create a new asset in the "/acme" collection
-        print("== Create asset ==")
-        timestamp = re.sub(':','-',str(datetime.datetime.now()))
-        new_asset_name = "hector-via-python-%s" % timestamp
-        asset_id = create_asset(connection, new_asset_name, '/acme', 'this is a note')
-        print(asset_id)
-
-        # Get asset metadata
-        print("== Asset metadata for %s ==" % asset_id)
-        asset_metadata = get_asset_metadata(connection, asset_id)
-        print(asset_metadata)
-
-        # Change the metadata
-        print("== Change asset metadata for %s ==" % asset_id)
-        updated_asset_name = new_asset_name + " updated"
-        result = set_asset_metadata(connection, asset_id, updated_asset_name, 'this is an updated note')
-        print(result)
-
-        # Get updated asset metadata
-        print("== Asset metadata for % s ==" % asset_id)
-        asset_metadata = get_asset_metadata(connection, asset_id)
-        print(asset_metadata)
-
+        if action == "mf-version":
+            result = connection.execute('server.version')
+            print("== MediaFlux version information == ")
+            print(result) # full XML
+            print(result.value('version')) #version number
+        elif action == "create":
+            # Create a new asset in the "/acme" collection
+            print("== Create asset ==")
+            timestamp = re.sub(':','-',str(datetime.datetime.now()))
+            new_asset_name = "hector-via-python-%s" % timestamp
+            asset_id = create_asset(connection, new_asset_name, '/acme', 'this is a note')
+            print(asset_id)
+        elif action == "get":
+            # Get asset metadata
+            print("== Asset metadata for %s ==" % asset_id)
+            asset_metadata = get_asset_metadata(connection, asset_id)
+            print(asset_metadata)
+            print(asset_metadata.value('name'))
+        elif action == "update":
+            # Change the metadata
+            print("== Change asset metadata for %s ==" % asset_id)
+            asset_metadata = get_asset_metadata(connection, asset_id)
+            asset_name = asset_metadata.value('name')
+            timestamp = re.sub(':','-',str(datetime.datetime.now()))
+            result = set_asset_metadata(connection, asset_id, asset_name, 'this is an updated note ' + timestamp)
+            print(asset_name)
+        else:
+            print("syntax:")
+            print("    demo.py action [id]")
+            print("")
+            print("Valid actions: ")
+            print("    mf-version")
+            print("    create")
+            print("    get")
+            print("    update")
+            print("")
+            print("id represents an existing valid asset id in MediaFlux and it's required for get and update")
     finally:
         connection.close()
 
