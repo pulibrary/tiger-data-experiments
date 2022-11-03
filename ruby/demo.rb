@@ -1,25 +1,19 @@
 #!/usr/bin/env ruby
 
 require 'yaml'
-require 'net/http'
 require 'rexml/document'
 require 'byebug'
 
-def mf_post(mf_host, mf_port, body)
-  https = Net::HTTP.new(mf_host, mf_port)
-  https.use_ssl = true
-  https.read_timeout = 3 # I often forget the VPN, so set this low.
-  https.continue_timeout = 3
-  request = Net::HTTP::Post.new("__mflux_svc__")
-  request.body = body
-  request["Content-Type"] = "text/xml; charset=utf-8"
-  response = https.request(request)
-  response_doc = REXML::Document.new(response.body)
-  return response_doc
-end
+require './mf_client'
 
 config = YAML.load_file('config.yaml')
 
+mf_client = MFClient.new(
+  mf_host: config["mf_host"],
+  mf_port: config["mf_port"],
+  mf_domain: config["mf_domain"],
+  mf_username: config["mf_username"],
+  mf_password: config["mf_password"])
 # Based on curl example from page 14 of "Mediaflux Developer Guide":
 
 logon_request_xml = %Q{<request>
@@ -36,7 +30,7 @@ logon_request_xml = %Q{<request>
 # request_xml_doc = REXML::Document.new(request_xml)
 # puts request_xml_doc.elements["request/service/args/domain"].text
 
-response_doc = mf_post(config["mf_host"], config["mf_port"], logon_request_xml)
+response_doc = mf_client.mf_post(logon_request_xml)
 puts response_doc
 
 session_id = response_doc.elements["response/reply/result/session"].text
@@ -47,7 +41,7 @@ ns_list_xml = %Q{<request>
   <service name="asset.namespace.list" session="#{session_id}"/>
 </request>}
 
-response_doc = mf_post(config["mf_host"], config["mf_port"], ns_list_xml)
+response_doc = mf_client.mf_post(ns_list_xml)
 puts response_doc
 
 
@@ -56,6 +50,6 @@ logoff_request_xml = %Q{<request>
   <service name="system.logoff" session="#{session_id}"/>
 </request>}
 
-response_doc = mf_post(config["mf_host"], config["mf_port"], logoff_request_xml)
-# puts response_doc
+response_doc = mf_client.mf_post(logoff_request_xml)
+puts response_doc
 
