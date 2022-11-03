@@ -31,6 +31,7 @@ MF_HOST=os.environ.get('MF_HOST', "your-host")
 MF_DOMAIN=os.environ.get('MF_DOMAIN', "your-domain")
 MF_USER=os.environ.get('MF_USER', "your-user")
 MF_PASSWORD=os.environ.get('MF_PASSWORD', "your-password")
+MF_NAMESPACE='/acme'
 
 def create_asset(connection, name, namespace, note):
     """ Create an asset with specified name in the given namespace.
@@ -117,6 +118,62 @@ def set_asset_metadata(connection, asset_id, new_name, new_note):
     result = connection.execute('asset.set', w.doc_text())
 
 
+def create_asset_with_content(connection, name, namespace, input_file_path):
+    """ Create an asset with specified name in the given namespace.
+
+    :param connection: Mediaflux server connection object
+    :type connection: mfclient.MFConnection
+    :param name: Name of the asset
+    :type name: str
+    :param namespace: Destination asset namespace
+    :type namespace: str
+    :param input_file_path: Input file path
+    :type input_file_path: str
+    :return: id of the asset
+    :rtype: int
+    """
+    # compose service arguments
+    w = mfclient.XmlStringWriter('args')
+    w.add('namespace', namespace, attributes={'create': True})  # the destination namespace where the asset is created
+    w.add('name', name)
+    w.push('meta')
+    w.push('mf-name')
+    w.add('name', name)
+    w.pop()
+    w.pop()
+
+    input = mfclient.MFInput(path=input_file_path)
+
+    # run asset.create service
+    result = connection.execute('asset.create', w.doc_text(), inputs=[input])
+
+    # return asset id
+    asset_id = result.int_value('id')
+    return asset_id
+
+
+def get_asset_content(connection, asset_id, output_file_path):
+    """ Gets asset metadata.
+
+    :param connection: Mediaflux server connection object
+    :type connection: mfclient.MFConnection
+    :param asset_id: Asset id
+    :type asset_id: int or str
+    :return:
+    """
+    # compose service arguments
+    w = mfclient.XmlStringWriter('args')
+    w.add('id', asset_id)
+
+    output = mfclient.MFOutput(path=output_file_path)
+
+    # run asset.get service
+    result = connection.execute('asset.get', w.doc_text(), outputs=[output])
+
+    asset_metadata = result.element('asset')
+    return asset_metadata
+
+
 if __name__ == '__main__':
 
     action = "help" if len(sys.argv) == 1 else sys.argv[1]
@@ -136,20 +193,37 @@ if __name__ == '__main__':
             print(result) # full XML
             print(result.value('version')) #version number
         elif action == "create":
-            # Create a new asset in the "/acme" collection
-            print("== Create asset ==")
-            timestamp = re.sub(':','-',str(datetime.datetime.now()))
-            new_asset_name = "hector-via-python-%s" % timestamp
-            asset_id = create_asset(connection, new_asset_name, '/acme', 'this is a note')
-            print(asset_id)
+            filename=sys.argv[2] if len(sys.argv) == 3 else ""
+            if filename == "":
+                # Create a new asset WITHOUT content.
+                # Asset is created in the MF_NAMESPACE.
+                print("== Create asset ==")
+                timestamp = re.sub(':','-',str(datetime.datetime.now()))
+                new_asset_name = "hector-via-python-%s" % timestamp
+                asset_id = create_asset(connection, new_asset_name, MF_NAMESPACE, 'this is a note')
+                print(asset_id)
+            else:
+                # Create a new asset WITH the content of the indicated filename.
+                # Asset is created in the MF_NAMESPACE.
+                new_asset_name = os.path.basename(filename)
+                asset_id = create_asset_with_content(connection, new_asset_name, MF_NAMESPACE, filename)
+                print(asset_id)
         elif action == "get":
-            # Get asset metadata
-            print("== Asset metadata for %s ==" % asset_id)
-            asset_metadata = get_asset_metadata(connection, asset_id)
-            print(asset_metadata)
-            print(asset_metadata.value('name'))
+            filename=sys.argv[3] if len(sys.argv) == 4 else ""
+            if filename == "":
+                # Get asset metadata for the given asset_id
+                print("== Asset metadata for %s ==" % asset_id)
+                asset_metadata = get_asset_metadata(connection, asset_id)
+                print(asset_metadata)
+                print(asset_metadata.value('name'))
+            else:
+                # Get asset metadata for the given asset_id and filename
+                # I don't know how this is different from `get_asset_metadata`
+                print("== Asset metadata for %s " + str(asset_id) + " " + filename)
+                asset_metadata = get_asset_content(connection, asset_id, filename)
+                print(asset_metadata)
         elif action == "update":
-            # Change the metadata
+            # Changes the note in the metadata for the given asset_id
             print("== Change asset metadata for %s ==" % asset_id)
             asset_metadata = get_asset_metadata(connection, asset_id)
             asset_name = asset_metadata.value('name')
