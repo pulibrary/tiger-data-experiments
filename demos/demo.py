@@ -16,8 +16,10 @@
 #
 # Examples:
 #   python3 demo.py create
+#   python3 demo.py create filename.txt
 #   python3 demo.py get 1234
 #   python3 demo.py update 1234
+#   python3 demo.py get 1234 output.txt
 #
 import datetime
 import re
@@ -217,9 +219,8 @@ if __name__ == '__main__':
                 print(asset_metadata)
                 print(asset_metadata.value('name'))
             else:
-                # Get asset metadata for the given asset_id and filename
-                # I don't know how this is different from `get_asset_metadata`
-                print("== Asset metadata for %s " + str(asset_id) + " " + filename)
+                # Gets the content for the given asset_id and saves it to filename
+                print("== Saved content from asset " + str(asset_id) + " into file " + filename)
                 asset_metadata = get_asset_content(connection, asset_id, filename)
                 print(asset_metadata)
         elif action == "update":
