@@ -6,22 +6,18 @@ require 'byebug'
 
 require './mf_client'
 
-config = YAML.load_file('config.yaml')
+# Hash with symbolic keys, but avoid extra Rails dependencies for now: 
+config = YAML.load_file('config.yaml').map { |k, v| [k.to_sym, v] }.to_h
 
-mf_client = MFClient.new(
-  mf_host: config["mf_host"],
-  mf_port: config["mf_port"],
-  mf_domain: config["mf_domain"],
-  mf_username: config["mf_username"],
-  mf_password: config["mf_password"])
+mf_client = MFClient.new(**config)
 # Based on curl example from page 14 of "Mediaflux Developer Guide":
 
 logon_request_xml = %Q{<request>
   <service name="system.logon">
     <args>
-      <domain>#{config["mf_domain"]}</domain>
-      <user>#{config["mf_username"]}</user>
-      <password>#{config["mf_password"]}</password>
+      <domain>#{config[:mf_domain]}</domain>
+      <user>#{config[:mf_username]}</user>
+      <password>#{config[:mf_password]}</password>
     </args>
   </service>
 </request>}
