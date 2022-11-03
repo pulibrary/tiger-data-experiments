@@ -1,5 +1,6 @@
 # Copy to config.yaml and fill in username and password.
 mf_domain: library-it
+mf_port: 443
 mf_host: arca.rc.princeton.edu
 mf_username: ...
 mf_password: ...
