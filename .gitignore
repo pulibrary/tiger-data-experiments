@@ -10,6 +10,7 @@
 /test/version_tmp/
 /tmp/
 python/config_connect.py
+python/mfclient.py
 
 # Used by dotenv library to load environment variables.
 # .env
