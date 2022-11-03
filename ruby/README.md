@@ -1,0 +1,3 @@
+- `cp config.yaml.template config.yaml`
+- Fill in username and password
+- `./demo.rb`
