@@ -1,4 +1,5 @@
 require 'net/http'
+require 'rexml/document'
 
 class MFClient
   def initialize(mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:)
