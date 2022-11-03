@@ -9,7 +9,19 @@ class MFClient
     @mf_password = mf_password
   end
 
-  def mf_post(body)
+  def call(service_name, *xml_args, session: nil)
+    session_attr = session ? %Q{session="#{session}"} : ''
+    request_xml = %Q{<request>
+      <service name="#{service_name}" #{session_attr}>
+        <args>#{xml_args.join()}</args>
+      </service>
+    </request>}
+    post(request_xml)
+  end
+
+  private
+
+  def post(body)
     https = Net::HTTP.new(@mf_host, @mf_port)
     https.use_ssl = true
     https.read_timeout = 3 # I often forget the VPN, so set this low.
