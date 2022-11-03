@@ -20,7 +20,7 @@ class MFClient
   end
 
   def session()
-    response_doc = self.call("system.logon",
+    response_doc = call("system.logon",
       "<domain>#{@mf_domain}</domain>",
       "<user>#{@mf_username}</user>",
       "<password>#{@mf_password}</password>",
@@ -28,11 +28,9 @@ class MFClient
     @session = response_doc.elements["response/reply/result/session"].text
     # Note: "reply/result" are not in the docs
 
-    response_doc = self.call("asset.namespace.list")
-    puts response_doc
+    yield
 
-    response_doc = self.call("system.logoff")
-    puts response_doc
+    response_doc = call("system.logoff")
   end
 
   private
