@@ -21,11 +21,12 @@ class MFClient
     @mf_password = mf_password
   end
 
-  def call(service_name, *xml_args)
+  def call(service_name, **args)
+    args_xml_fragment = to_xml(args)
     session_attr = @session ? %Q{session="#{@session}"} : ""
     request_xml = %Q{<request>
       <service name="#{service_name}" #{session_attr}>
-        <args>#{xml_args.join()}</args>
+        <args>#{args_xml_fragment}</args>
       </service>
     </request>}
     response = post(request_xml)
@@ -38,11 +39,11 @@ class MFClient
   end
 
   def session()
-    response_doc = call("system.logon", to_xml({
+    response_doc = call("system.logon",
       domain: @mf_domain,
       user: @mf_username,
       password: @mf_password
-    }))
+    )
     @session = response_doc.elements["response/reply/result/session"].text
     # Note: "reply/result" are not in the docs
 
