@@ -46,9 +46,11 @@ mf.session() do
   # id = doc.elements["//id"].first
   # doc = mf.destroy_asset_doc_type id: id
 
+  mf.describe_asset_doc_type type: "mf-note" 
+
   earth = mf.create_asset(
     allow_invalid_meta: true, # Because this doesn't conform to "mf_note".
-    meta: {mf_note: {name: "Earth", order: 3, moons: 1, gas1: "N2", gas2: "O2"}}
+    meta: {mf_note: {name: "Earth", order: 3, moons: 1, gas1: "N2", gas2: "O2", note: "My favorite!"}}
   )
   earth_id = earth.elements["//id"].first
 
@@ -66,14 +68,28 @@ mf.session() do
 
   # Error: The document type '' is not known
   # mf.get_asset id: earth_id, xpath: "//gas"
+  # mf.get_asset id: earth_id, xpath: "//note"
 
-  mf.get_asset id: earth_id
+  # TODO: XML generation has a bug:
+  # <xpath ename="atmosphere"><>mf-note/gas</></xpath>
+  mf.get_asset(
+    id: earth_id,
+    xpath_1: "mf-note/note", # element name defaults to "value"
+    xpath_2: {_ename: "atmosphere", _: "mf-note/gas"}
+  )
 
   # No result. :(
   mf.query_asset(
     where: "type=mf-note",
     action: "get-value",
     xpath: "//name" 
+  )
+
+  # No result. :(
+  mf.query_asset(
+    where: "type=mf-note",
+    action: "get-value",
+    xpath: "mf-note/note" 
   )
 
   # A list of IDs!
