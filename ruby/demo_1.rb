@@ -14,7 +14,7 @@ mf = MediaFlux::MFClient.new(**config)
 begin
   puts "\nUnknown service:"
   mf.call("foo.bar")
-rescue MediaFlux::MFError => e
+rescue MediaFlux::MFApiError => e
   puts e.error
   puts e.message
   puts e.stack.split("\n").first

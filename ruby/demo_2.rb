@@ -17,6 +17,15 @@ mf.session() do
     puts el.text
   end
 
+  puts "\nCreate asset:"
+  doc = mf.create_asset name: "dog"
+  puts doc
+  id = doc.elements["//id"].first
+
+  puts "\nDelete:"
+  doc = mf.destroy_asset id: id
+  puts doc
+
   # begin
   #   puts "\nImport asset, data uri FAILS:"
   #   doc = mf.call("asset.import", url: "data:text-plain,hello-world!")
