@@ -63,3 +63,33 @@ class MFClient
     REXML::Document.new(response.body)
   end
 end
+
+# Designed for concise representation of XML fragments as Hashes:
+# - Symbolic keys become elements
+# - ... unless first charcter is an underscore: then attribute
+# - Underscores in names translated to dashes
+# - Text can be the value, or can use the "_" key, if there are other attributes.
+def to_xml(hash_or_scalar)
+  # TODO: Encoding
+  return hash_or_scalar unless hash_or_scalar.class == Hash 
+  hash_or_scalar.map {|key, value|
+    name = key.to_s.sub("_","-")
+    if name == "-" then
+      value
+    elsif name[0] == "-" then
+      attr_name = name[1..-1]
+      # TODO: Error if not scalar
+      # TODO: Encoding
+      %Q{ #{attr_name}="#{value}"}
+    else
+      if value.class == Hash then
+        attr_value = value.select {|k,v| k.to_s[0] == '_' and k != :_}
+        other_value = value.select {|k,v| k.to_s[0] != '_' or k == :_}
+      else
+        attr_value = ""
+        other_value = value
+      end
+      "<#{name}#{to_xml(attr_value)}>#{to_xml(other_value)}</#{name}>"
+    end
+  }.join("")
+end
