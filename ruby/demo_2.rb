@@ -47,7 +47,7 @@ mf.session() do
   # doc = mf.destroy_asset_doc_type id: id
 
   earth = mf.create_asset(
-    allow_invalid_meta: true,
+    allow_invalid_meta: true, # Because this doesn't conform to "mf_note".
     meta: {mf_note: {name: "Earth", order: 3, moons: 1, gas1: "N2", gas2: "O2"}}
   )
   earth_id = earth.elements["//id"].first
@@ -63,6 +63,28 @@ mf.session() do
     meta: {mf_note: {name: "Mars", order: 4, moons: 2, gas: "CO2"}}
   )
   mars_id = mars.elements["//id"].first
+
+  # Error: The document type '' is not known
+  # mf.get_asset id: earth_id, xpath: "//gas"
+
+  mf.get_asset id: earth_id
+
+  # No result. :(
+  mf.query_asset(
+    where: "type=mf-note",
+    action: "get-value",
+    xpath: "//name" 
+  )
+
+  # A list of IDs!
+  mf.query_asset(
+    where: "xpath(mf-note) has value",
+  )
+
+  # Error: The document type 'mf-note' does not contain an element 'moons'
+  # mf.query_asset(
+  #   where: "xpath(mf-note/moons) has value",
+  # )
 
   mf.destroy_asset id: earth_id
   mf.destroy_asset id: venus_id
