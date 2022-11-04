@@ -10,8 +10,18 @@ config = YAML.load_file('config.yaml').map { |k, v| [k.to_sym, v] }.to_h
 
 mf = MFClient.new(**config)
 
+
+begin
+  puts "\nUnknown service:"
+  mf.call("foo.bar")
+rescue MFError => e
+  puts e.error
+  puts e.message
+  puts e.stack.split("\n").first
+end
+
 mf.session() do
-  puts "List namespaces:"
+  puts "\nList namespaces:"
   doc = mf.call("asset.namespace.list")
   doc.elements["//namespace"].each do |el|
     puts el.text

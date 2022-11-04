@@ -1,6 +1,17 @@
 require 'net/http'
 require 'rexml/document'
 
+class MFError < StandardError
+  attr_reader :error, :message, :stack
+  def initialize(response_doc)
+    reply = response_doc.elements['/response/reply']
+    @error = reply.elements['error'].text
+    @message = reply.elements['message'].text
+    @stack = reply.elements['stack'].text
+  end
+end
+
+
 class MFClient
   def initialize(mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:)
     @mf_host = mf_host
@@ -11,13 +22,19 @@ class MFClient
   end
 
   def call(service_name, *xml_args)
-    session_attr = @session ? %Q{session="#{@session}"} : ''
+    session_attr = @session ? %Q{session="#{@session}"} : ""
     request_xml = %Q{<request>
       <service name="#{service_name}" #{session_attr}>
         <args>#{xml_args.join()}</args>
       </service>
     </request>}
-    post(request_xml)
+    response = post(request_xml)
+    response_type = response.elements["/response/reply/@type"].value
+    if response_type == "error" then
+      raise MFError.new(response)
+    else
+      return response
+    end
   end
 
   def session()
