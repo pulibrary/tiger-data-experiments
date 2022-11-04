@@ -48,4 +48,44 @@ mf.session() do
   puts "\nDelete:"
   doc = mf.call("asset.destroy", id: id)
   puts doc
+
+  begin
+    puts "\nImport asset by reference FAILS:"
+    doc = mf.call("asset.import", url: {
+      _by: "reference",
+      _: "https://www.princeton.edu/robots.txt"
+    })
+    # puts doc
+    # id = doc.elements["//id"].first
+
+    # puts "\nGet asset:"
+    # doc = mf.call("asset.get", id: id)
+    # puts doc
+
+    # puts "\nDelete:"
+    # doc = mf.call("asset.destroy", id: id)
+    # puts doc
+  rescue MFError => e
+    puts e.message
+  end
+
+  begin
+    puts "\nImport asset by reference FAILS:"
+    doc = mf.call("asset.import", url: {
+      _by: "reference",
+      _: "https://www.princeton.edu/robots.txt"
+    })
+    # puts doc
+    # id = doc.elements["//id"].first
+
+    # puts "\nGet asset:"
+    # doc = mf.call("asset.get", id: id)
+    # puts doc
+
+    # puts "\nDelete:"
+    # doc = mf.call("asset.destroy", id: id)
+    # puts doc
+  rescue MFError => e
+    puts e.message
+  end
 end

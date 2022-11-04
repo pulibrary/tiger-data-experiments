@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require 'byebug'
+
+require './mf_client'
+
+# Hash with symbolic keys; Avoid extra Rails dependencies for now: 
+config = YAML.load_file('config.yaml').map { |k, v| [k.to_sym, v] }.to_h
+
+mf = MFClient.new(**config)
+
+mf.session() do
+  begin
+    puts "\nImport asset, data uri FAILS:"
+    doc = mf.call("asset.import", url: "data:text-plain,hello-world!")
+  rescue MFError => e
+    puts e.message
+  end
+
+
+  # puts doc
+  # id = doc.elements["//id"].first
+
+  # puts "\nGet asset:"
+  # doc = mf.call("asset.get", id: id)
+  # puts doc
+
+  # puts "\nDelete:"
+  # doc = mf.call("asset.destroy", id: id)
+  # puts doc
+end
