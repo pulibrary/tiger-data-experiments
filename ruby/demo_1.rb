@@ -45,7 +45,7 @@ mf.session() do
   doc = mf.call("asset.get", id: {_version: 1, _: id})
   puts doc
 
-  puts "\nDelete:"
+  puts "\nDestroy:"
   doc = mf.call("asset.destroy", id: id)
   puts doc
 

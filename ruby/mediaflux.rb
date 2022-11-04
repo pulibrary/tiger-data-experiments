@@ -20,8 +20,11 @@ module MediaFlux
   end
 
   class MFClient
-    def initialize(readable: false, mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:)
+    def initialize(
+        readable: false, verbose: false,
+        mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:)
       @readable = readable
+      @verbose = verbose
       @mf_host = mf_host
       @mf_port = mf_port
       @mf_domain = mf_domain
@@ -39,6 +42,7 @@ module MediaFlux
     end
 
     def call(service_name, **args)
+      puts "\n#{service_name}: #{args}" if @verbose
       request_xml = MediaFlux.to_xml({
         request: {
           service: {
@@ -54,7 +58,9 @@ module MediaFlux
         raise MediaFlux::MFApiError.new(response)
       elsif response_type == "result"
         # Note: "reply/result" are not in the docs
-        return response.elements["/response/reply/result"]
+        result = response.elements["/response/reply/result"]
+        puts MediaFlux.pretty result if @verbose
+        return result
       else
         raise MediaFlux::MFError("Unexpected response type '#{response_type}'")
       end
@@ -118,4 +124,9 @@ module MediaFlux
     }.join("")
   end
 
+  def pretty(doc)
+    formatter = REXML::Formatters::Pretty.new
+    formatter.compact = true
+    formatter.write(doc, "")
+  end
 end
