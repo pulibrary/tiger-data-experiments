@@ -46,5 +46,26 @@ mf.session() do
   # id = doc.elements["//id"].first
   # doc = mf.destroy_asset_doc_type id: id
 
+  earth = mf.create_asset(
+    allow_invalid_meta: true,
+    meta: {mf_note: {name: "Earth", order: 3, moons: 1, gas1: "N2", gas2: "O2"}}
+  )
+  earth_id = earth.elements["//id"].first
+
+  venus = mf.create_asset(
+    allow_invalid_meta: true,
+    meta: {mf_note: {name: "Venus", order: 2, moons: 0, gas: "CO2"}}
+  )
+  venus_id = venus.elements["//id"].first
+
+  mars = mf.create_asset(
+    allow_invalid_meta: true,
+    meta: {mf_note: {name: "Mars", order: 4, moons: 2, gas: "CO2"}}
+  )
+  mars_id = mars.elements["//id"].first
+
+  mf.destroy_asset id: earth_id
+  mf.destroy_asset id: venus_id
+  mf.destroy_asset id: mars_id
 
 end
