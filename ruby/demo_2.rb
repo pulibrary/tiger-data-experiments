@@ -10,11 +10,17 @@ config = YAML.load_file('config.yaml').map { |k, v| [k.to_sym, v] }.to_h
 
 mf = MediaFlux::MFClient.new(readable: true, **config)
 
+def pretty(doc)
+  formatter = REXML::Formatters::Pretty.new
+  formatter.compact = true
+  formatter.write(doc, "")
+end
+
 mf.session() do
   # Based on https://docs.google.com/presentation/d/168Cjz8gXy3ESrPnvjATFpcHrcSNFu2x6/edit#slide=id.p122
   puts "\nList document namespaces:"
   doc = mf.list_asset_doc_namespace
-  puts doc
+  puts pretty(doc)
   # id = doc.elements["//id"].first
 
   # puts "\nDelete:"
