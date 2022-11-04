@@ -29,29 +29,23 @@ mf.session() do
 
   # Based on https://docs.google.com/presentation/d/1GAt7tr2Vb-KJtILbcEcMlr71qxVo0j5-/edit#slide=id.p23
   puts "\nCreate asset:"
-  doc = mf.call("asset.create", "<name>dog</name>")
+  doc = mf.call("asset.create", to_xml({name: "dog"}))
   puts doc
   id = doc.elements["//id"].first
 
   puts "\nGet asset:"
-  doc = mf.call("asset.get", "<id>#{id}</id>")
+  doc = mf.call("asset.get", to_xml({id: id}))
   puts doc
 
   puts "\nSet metadata:"
-  doc = mf.call("asset.set", "<id>#{id}</id>",
-    "<meta><mf-note><note>Hello</note></mf-note></meta>")
+  doc = mf.call("asset.set", to_xml({id: id, meta: {mf_note: {note: "Hello"}}}))
   puts doc
   
   puts "\nView original:"
-  doc = mf.call("asset.get", %Q{<id version="1">#{id}</id>})
+  doc = mf.call("asset.get", to_xml({id: {_version: 1, _: id}}))
   puts doc
 
   puts "\nDelete:"
-  doc = mf.call("asset.destroy", %Q{<id>#{id}</id>})
+  doc = mf.call("asset.destroy", to_xml({id: id}))
   puts doc
 end
-
-# response_doc = mf_client.call("asset.namespace.list", session: session)
-# puts response_doc
-
-
