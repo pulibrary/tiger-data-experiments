@@ -38,11 +38,11 @@ class MFClient
   end
 
   def session()
-    response_doc = call("system.logon",
-      "<domain>#{@mf_domain}</domain>",
-      "<user>#{@mf_username}</user>",
-      "<password>#{@mf_password}</password>",
-    )
+    response_doc = call("system.logon", to_xml({
+      domain: @mf_domain,
+      user: @mf_username,
+      password: @mf_password
+    }))
     @session = response_doc.elements["response/reply/result/session"].text
     # Note: "reply/result" are not in the docs
 
