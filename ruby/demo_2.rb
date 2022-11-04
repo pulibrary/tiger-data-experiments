@@ -3,18 +3,18 @@
 require 'yaml'
 require 'byebug'
 
-require './mf_client'
+require './mediaflux'
 
-# Hash with symbolic keys; Avoid extra Rails dependencies for now: 
+# Load hash with symbolic keys; Avoid extra Rails dependencies for now: 
 config = YAML.load_file('config.yaml').map { |k, v| [k.to_sym, v] }.to_h
 
-mf = MFClient.new(**config)
+mf = MediaFlux::MFClient.new(**config)
 
 mf.session() do
   begin
     puts "\nImport asset, data uri FAILS:"
     doc = mf.call("asset.import", url: "data:text-plain,hello-world!")
-  rescue MFError => e
+  rescue MediaFlux::MFError => e
     puts e.message
   end
 
