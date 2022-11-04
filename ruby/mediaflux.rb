@@ -20,12 +20,22 @@ module MediaFlux
   end
 
   class MFClient
-    def initialize(mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:)
+    def initialize(readable: false, mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:)
+      @readable = readable
       @mf_host = mf_host
       @mf_port = mf_port
       @mf_domain = mf_domain
       @mf_username = mf_username
       @mf_password = mf_password
+    end
+
+    def method_missing(service_sym, **args)
+      if @readable
+        service = service_sym.to_s.split("_").rotate.join(".")
+        call(service, **args)
+      else
+        super
+      end
     end
 
     def call(service_name, **args)
