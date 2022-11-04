@@ -39,8 +39,6 @@ class MFClient
   def post(body)
     https = Net::HTTP.new(@mf_host, @mf_port)
     https.use_ssl = true
-    https.read_timeout = 3 # I often forget the VPN, so set this low.
-    https.continue_timeout = 3
     request = Net::HTTP::Post.new("__mflux_svc__")
     request.body = body
     request["Content-Type"] = "text/xml; charset=utf-8"
