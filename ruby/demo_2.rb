@@ -11,20 +11,15 @@ config = YAML.load_file('config.yaml').map { |k, v| [k.to_sym, v] }.to_h
 mf = MediaFlux::MFClient.new(readable: true, **config)
 
 mf.session() do
-  puts "\nList namespaces:"
-  doc = mf.list_asset_namespace
-  doc.elements["//namespace"].each do |el|
-    puts el.text
-  end
-
-  puts "\nCreate asset:"
-  doc = mf.create_asset name: "dog"
+  # Based on https://docs.google.com/presentation/d/168Cjz8gXy3ESrPnvjATFpcHrcSNFu2x6/edit#slide=id.p122
+  puts "\nList document namespaces:"
+  doc = mf.list_asset_doc_namespace
   puts doc
-  id = doc.elements["//id"].first
+  # id = doc.elements["//id"].first
 
-  puts "\nDelete:"
-  doc = mf.destroy_asset id: id
-  puts doc
+  # puts "\nDelete:"
+  # doc = mf.destroy_asset id: id
+  # puts doc
 
   # begin
   #   puts "\nImport asset, data uri FAILS:"

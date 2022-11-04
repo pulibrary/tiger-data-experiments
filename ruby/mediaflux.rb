@@ -52,23 +52,25 @@ module MediaFlux
       response_type = response.elements["/response/reply/@type"].value
       if response_type == "error" then
         raise MediaFlux::MFApiError.new(response)
+      elsif response_type == "result"
+        # Note: "reply/result" are not in the docs
+        return response.elements["/response/reply/result"]
       else
-        return response
+        raise MediaFlux::MFError("Unexpected response type '#{response_type}'")
       end
     end
 
     def session()
-      response_doc = call("system.logon",
+      result_doc = call("system.logon",
         domain: @mf_domain,
         user: @mf_username,
         password: @mf_password
       )
-      @session = response_doc.elements["response/reply/result/session"].text
-      # Note: "reply/result" are not in the docs
+      @session = result_doc.elements["session"].text
 
       yield
 
-      response_doc = call("system.logoff")
+      call("system.logoff")
     end
 
     private
