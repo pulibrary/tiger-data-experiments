@@ -52,6 +52,7 @@ module MediaFlux
           }
         }
       })
+      puts request_xml if @verbose
       response = post(request_xml)
       response_type = response.elements["/response/reply/@type"].value
       if response_type == "error" then
@@ -103,7 +104,7 @@ module MediaFlux
     # TODO: Encoding
     return hash_or_scalar unless hash_or_scalar.class == Hash 
     hash_or_scalar.map {|key, value|
-      name = key.to_s.sub("_","-")
+      name = key.to_s.gsub(/[_\d]+$/, "").gsub("_", "-")
       if name == "-" then
         value
       elsif name[0] == "-" then

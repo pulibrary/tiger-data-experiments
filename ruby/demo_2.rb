@@ -21,5 +21,30 @@ mf.session() do
   # doc = mf.create_asset_doc_namespace namespace: "foobar"
   # doc = mf.destroy_asset_doc_namespace namespace: "foobar"
 
+  mf.list_asset_doc_type
+
+  # Don't have privs: (I tried a few different namespaces)
+  #  call to service 'asset.doc.type.create' failed: user 'library-it:cm757' (id=67) not granted ADMINISTER to document:namespace 'arc:'
+  # doc = mf.create_asset_doc_type(
+  #   type: "arc:chuck-demo",
+  #   label: "chuck-demo",
+  #   definition: {
+  #     element_1: {
+  #       _name: "name",
+  #       _type: "string",
+  #       _max_occurs: 1,
+  #       _min_occurs: 1
+  #     },
+  #     element_2: {
+  #       _name: "description",
+  #       _type: "string",
+  #       _max_occurs: 1,
+  #       _min_occurs: 1
+  #     }
+  #   }
+  # )
+  # id = doc.elements["//id"].first
+  # doc = mf.destroy_asset_doc_type id: id
+
 
 end
