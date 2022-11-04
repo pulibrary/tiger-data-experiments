@@ -22,13 +22,15 @@ class MFClient
   end
 
   def call(service_name, **args)
-    args_xml_fragment = to_xml(args)
-    session_attr = @session ? %Q{session="#{@session}"} : ""
-    request_xml = %Q{<request>
-      <service name="#{service_name}" #{session_attr}>
-        <args>#{args_xml_fragment}</args>
-      </service>
-    </request>}
+    request_xml = to_xml({
+      request: {
+        service: {
+          _name: service_name,
+          _session: @session,
+          args: args
+        }
+      }
+    })
     response = post(request_xml)
     response_type = response.elements["/response/reply/@type"].value
     if response_type == "error" then
@@ -84,8 +86,8 @@ def to_xml(hash_or_scalar)
       %Q{ #{attr_name}="#{value}"}
     else
       if value.class == Hash then
-        attr_value = value.select {|k,v| k.to_s[0] == '_' and k != :_}
-        other_value = value.select {|k,v| k.to_s[0] != '_' or k == :_}
+        attr_value = value.select {|k,v| (k.to_s[0] == '_' and k != :_) and v != nil}
+        other_value = value.select {|k,v| (k.to_s[0] != '_' or k == :_) and v != nil}
       else
         attr_value = ""
         other_value = value
