@@ -27,8 +27,8 @@ import mfclient
 import os
 import sys
 
-MF_PORT=443
-MF_TRANSPORT='https'
+MF_PORT=80
+MF_TRANSPORT='http'
 MF_HOST=os.environ.get('MF_HOST', "your-host")
 MF_DOMAIN=os.environ.get('MF_DOMAIN', "your-domain")
 MF_USER=os.environ.get('MF_USER', "your-user")
