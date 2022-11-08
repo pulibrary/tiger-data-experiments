@@ -48,10 +48,10 @@ class MediaFluxClient
   end
 
   # Fetches metadata for the given asset it
-  def get(id)
+  def get_metadata(id)
     xml_request = <<-XML_BODY
       <request>
-        <service name="asset.get" session="#{@session_id}" sgen="0" seq="2">
+        <service name="asset.get" session="#{@session_id}">
           <args>
             <id>#{id}</id>
           </args>
@@ -59,6 +59,19 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+  end
+
+  def get_content(id)
+    xml_request = <<-XML_BODY
+      <request>
+        <service name="asset.get" session="#{@session_id}" data-out-min="1" data-out-max="1">
+          <args>
+            <id>#{id}</id>
+          </args>
+        </service>
+      </request>
+    XML_BODY
+    response_body = http_post(xml_request, true)
   end
 
   def set_note(id, mf_note)
@@ -99,7 +112,7 @@ class MediaFluxClient
     filename = File.basename(filename_fullpath)
     xml_request = <<-XML_BODY
     <request>
-      <service name="asset.create" session="#{@session_id}" sgen="0" seq="2">
+      <service name="asset.create" session="#{@session_id}">
         <args>
           <namespace create="True">#{namespace}</namespace>
           <name>#{filename}</name>
@@ -110,11 +123,11 @@ class MediaFluxClient
     </request>
     XML_BODY
     file_content = File.read(filename_fullpath)
-    response_body = http_post(xml_request, file_content)
+    response_body = http_post(xml_request, true, file_content)
   end
 
   private
-    def http_post(payload, file_content = nil)
+    def http_post(payload, mflux = false, file_content = nil)
       url = @base_url
       uri = URI.parse(url)
       http = Net::HTTP.new(uri.host, uri.port)
@@ -124,21 +137,37 @@ class MediaFluxClient
       end
       request = Net::HTTP::Post.new(url)
 
-      if file_content.nil?
+      xml = @xml_declaration + payload
+      if mflux == false
         request["Content-Type"] = "text/xml"
-        request.body = @xml_declaration + payload
+        request.body = xml
       else
-        # For uploading files we use a different content-type that seems to be specific to MediaFlux.
+        # Here be dragons
+        # Requests are built different for this content-type
         request["Content-Type"] = "application/mflux"
-        xml = @xml_declaration + payload
-        mflux_request = xml_separator(xml) + xml + content_separator(file_content) + file_content
+        mflux_request = if file_content.nil?
+                          xml_separator(xml) + xml
+                        else
+                          xml_separator(xml) + xml + content_separator(file_content) + file_content
+                        end
         request.body = mflux_request
       end
+
       response = http.request(request)
-      response.body
+      if response.content_type == "application/mflux"
+        # More dragons
+        # Horrible hack to extract the content
+        header = response.body[0..23]
+        metadata_size = length_from_header(header)
+        start_at = metadata_size + 24 + 24 + 2  # metadata_size + header + header + 2
+        response.body[start_at..]
+      else
+        response.body
+      end
     end
 
     def xml_separator(xml)
+      # 01 00 xx xx xx xx xx xx xx xx 00 00 00 01 yy yy
       file_format = "text/xml"
       part1 = 1.chr + 0.chr + hex_bytes(xml.length)
       part2 = 0.chr + 0.chr + 0.chr + 1.chr + 0.chr + file_format.length.chr
@@ -146,6 +175,7 @@ class MediaFluxClient
     end
 
     def content_separator(content)
+      # 01 00 xx xx xx xx xx xx xx xx 00 00 00 01 00 00
       part1 = 1.chr + 0.chr + hex_bytes(content.length)
       part2 = 0.chr + 0.chr + 0.chr + 1.chr + 0.chr + 0.chr
       part1 + part2
@@ -163,10 +193,21 @@ class MediaFluxClient
       hex_bytes.join()
     end
 
+    # header: "\x01\x00\x00\x00\x00\x00\x00\x00\a\xF7\x00\x00\x00\x01\x00\btext/xml"
+    # length: 7F7 hex => 2039 dec
+    def length_from_header(header)
+      hex_str = ""
+      data = header[2..9]
+      data.each_char do |c|
+        hex_str += c.ord.to_s(16).rjust(2,"0")
+      end
+      hex_str.to_i(16)
+    end
+
     def connect()
       xml_request = <<-XML_BODY
         <request>
-          <service name="system.logon" sgen="0" seq="1">
+          <service name="system.logon">
             <args>
               <host>#{@host}</host>
               <domain>#{@domain}</domain>

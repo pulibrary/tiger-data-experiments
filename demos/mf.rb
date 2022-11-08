@@ -18,10 +18,13 @@ when action == "create"
   filename = ARGV[2]
   puts "Create new empty asset #{filename} in namespace #{namespace}"
   puts mf.create(namespace, filename)
-when action == "get"
+when action == "get-metadata"
   id = ARGV[1]
   puts "Metadata for asset id #{id}"
-  puts mf.get(id)
+  puts mf.get_metadata(id)
+when action == "get-content"
+  id = ARGV[1]
+  puts mf.get_content(id)
 when action == "set-note"
   id = ARGV[1]
   note = ARGV[2]
@@ -52,7 +55,8 @@ else
   puts ""
   puts "Examples:"
   puts "\tcreate /acme my-empty-file.txt"
-  puts "\tget 123456"
+  puts "\tget-metadata 123456"
+  puts "\tget-content 123456 > download.txt"
   puts "\tquery \"namespace='/acme'\""
   puts "\tquery \"namespace='/acme' and ctime>='now-24hour'\""
   puts "\tset-note 12345 \"hello world\""
