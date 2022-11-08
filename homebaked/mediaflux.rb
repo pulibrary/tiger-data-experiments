@@ -86,7 +86,7 @@ module MediaFlux
         user: @mf_username,
         password: @mf_password
       )
-      @session = result_doc.elements["session"].text
+      @session = result_doc.elements['session'].text
 
       yield
 
@@ -139,7 +139,7 @@ module MediaFlux
             attr_value = Hash[attr_other[0]]
             other_value = Hash[attr_other[1]]
           else
-            attr_value = ""
+            attr_value = ''
             other_value = value
           end
           "<#{name}#{to_xml(attr_value)}>#{to_xml(other_value)}</#{name}>"
@@ -154,6 +154,6 @@ module MediaFlux
   def pretty(doc)
     formatter = REXML::Formatters::Pretty.new
     formatter.compact = true
-    formatter.write(doc, "")
+    formatter.write(doc, '')
   end
 end

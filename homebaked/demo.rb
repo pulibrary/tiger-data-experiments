@@ -20,14 +20,14 @@ end
 
 mf.session do
   doc = mf.list_asset_namespace
-  doc.elements["//namespace"].each do |el|
+  doc.elements['//namespace'].each do |el|
     puts el.text
   end
 
   # Based on https://docs.google.com/presentation/d/1GAt7tr2Vb-KJtILbcEcMlr71qxVo0j5-/edit#slide=id.p23
 
   doc = mf.create_asset # name: "dog"
-  id = doc.elements["//id"].first
+  id = doc.elements['//id'].first
 
   mf.get_asset id: id
 
