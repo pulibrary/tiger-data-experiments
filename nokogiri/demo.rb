@@ -50,6 +50,24 @@ mf.session() do
       }
     }
   end
+
+  # Element and attribute names with dashes are pretty common in the MediaFlux API.
+  # If we do go with Nokogiri, we may want a specialized builder to map these names:
+  #
+  # def translate(name)
+  #   name.gsub("_", "-")
+  # end
+  #
+  # class MFBuilder < Nokogiri::XML::Builder
+  #   # MediaFlux xml elements consistently use dashes rather than underscores.
+  #   # Since dashes aren't allowed in names in Ruby, translate on the fly.
+  #   def method_missing(method, *args)
+  #     dashed_method = translate method
+  #     dashed_args = args.map {|arg| arg.class == Hash ? Hash[arg.map {|k,v| [translate(k),v]}] : arg}
+  #     super(dashed_method, *dashed_args)
+  #   end
+  # end
+
   args_xml = fragment.to_xml
   mf.call("asset.set", args_xml)
   
