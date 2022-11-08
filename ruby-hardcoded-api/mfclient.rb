@@ -155,12 +155,19 @@ class MediaFluxClient
 
       response = http.request(request)
       if response.content_type == "application/mflux"
-        # More dragons
-        # Horrible hack to extract the content
-        header = response.body[0..23]
-        metadata_size = length_from_header(header)
-        start_at = metadata_size + 24 + 24 + 2  # metadata_size + header + header + 2
-        response.body[start_at..]
+        metadata_only_header = "\u0001\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000y\u0000\u0000\u0000\u0000\u0000\btext/xml"
+        if response.body[0..23] == metadata_only_header
+          # Response includes only metadata
+          response.body[24..]
+        else
+          # Here be more dragons.
+          # Response include metadata + content.
+          # Horrible hack to extract the content
+          header = response.body[0..23]
+          metadata_size = length_from_header(header)
+          start_at = metadata_size + 24 + 24 + 2  # metadata_size + header + header + 2
+          response.body[start_at..]
+        end
       else
         response.body
       end
