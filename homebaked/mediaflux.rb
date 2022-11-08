@@ -16,9 +16,6 @@ module MediaFlux
     end
   end
 
-  class MFXmlError < MFError
-  end
-
   class MFClient
     def initialize(
         verbose: false,

@@ -50,6 +50,8 @@ mf.session() do
       }
     }
   end
+  args_xml = fragment.to_xml
+  mf.call("asset.set", args_xml)
 
   # Element and attribute names with dashes are pretty common in the MediaFlux API.
   # If we do go with Nokogiri, we may want a specialized builder to map these names:
@@ -67,9 +69,6 @@ mf.session() do
   #     super(dashed_method, *dashed_args)
   #   end
   # end
-
-  args_xml = fragment.to_xml
-  mf.call("asset.set", args_xml)
   
   fragment = Nokogiri::XML::DocumentFragment.parse("")
   Nokogiri::XML::Builder.with(fragment) do |xml|
