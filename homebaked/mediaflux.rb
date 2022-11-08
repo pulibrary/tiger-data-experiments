@@ -96,26 +96,34 @@ module MediaFlux
   # - Underscores in names translated to dashes
   # - Text can be the value, or can use the "_" key, if there are other attributes.
   def to_xml(hash_or_scalar)
-    # TODO: Encoding
-    return hash_or_scalar unless hash_or_scalar.class == Hash 
+    if hash_or_scalar.class != Hash
+      if hash_or_scalar.class != REXML::Document
+        return hash_or_scalar.to_s.encode(xml: :text)
+      end
+      return hash_or_scalar
+    end 
     hash_or_scalar.map {|key, value|
-      name = key.to_s.gsub(/[_\d]+$/, "").gsub("_", "-")
-      if name == "-" then
-        value
-      elsif name[0] == "-" then
-        attr_name = name[1..-1]
-        # TODO: Error if not scalar
-        # TODO: Encoding
-        %Q{ #{attr_name}="#{value}"}
+      if value.is_a? Array
+        value.map {|a_value| to_xml({key => a_value})}.join("")
       else
-        if value.class == Hash then
-          attr_value = value.select {|k,v| (k.to_s[0] == '_' and k != :_) and v != nil}
-          other_value = value.select {|k,v| (k.to_s[0] != '_' or k == :_) and v != nil}
+        name = key.class == String ? key.sub(/^_/, "-") : key.to_s.gsub("_", "-")
+        if name == "-" then
+          to_xml(value)
+        elsif name[0] == "-" then
+          attr_name = name[1..-1]
+          %Q{ #{attr_name}=#{value.to_s.encode(xml: :attr)}}
         else
-          attr_value = ""
-          other_value = value
+          if value.class == Hash then
+            non_nil = value.select {|k,v| v != nil}
+            attr_other = non_nil.partition {|k,v| (k.to_s[0] == '_' and k != :_)}
+            attr_value = Hash[attr_other[0]]
+            other_value = Hash[attr_other[1]]
+          else
+            attr_value = ""
+            other_value = value
+          end
+          "<#{name}#{to_xml(attr_value)}>#{to_xml(other_value)}</#{name}>"
         end
-        "<#{name}#{to_xml(attr_value)}>#{to_xml(other_value)}</#{name}>"
       end
     }.join("")
   end
