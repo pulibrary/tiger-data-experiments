@@ -32,6 +32,8 @@ when action == "query"
   puts "Assets for query #{aql_query}"
   puts mf.query(aql_query)
 when action == "upload"
+  namespace = ARGV[1]
+  filename = ARGV[2]
   puts "Uploads file #{filename} to namespace #{namespace}"
   puts mf.upload(namespace, filename)
 else
