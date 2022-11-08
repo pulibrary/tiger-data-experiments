@@ -14,9 +14,8 @@ mf = MediaFlux::MFClient.new(verbose: true, **config)
 begin
   puts "\nUnknown service:"
   mf.foo_bar
-rescue MediaFlux::MFError => e
-  puts e.error
-  puts e.message
+rescue MediaFlux::MFServiceError => e
+  puts "Error caught!"
 end
 
 mf.session() do

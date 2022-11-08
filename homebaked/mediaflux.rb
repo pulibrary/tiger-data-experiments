@@ -16,9 +16,12 @@ module MediaFlux
     end
   end
 
+  class MFServiceError < MFError
+  end
+
   class MFClient
     def initialize(
-        verbose: false,
+        verbose: false, allowed_services: [],
         mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:)
       @verbose = verbose
       @mf_host = mf_host
@@ -26,9 +29,17 @@ module MediaFlux
       @mf_domain = mf_domain
       @mf_username = mf_username
       @mf_password = mf_password
+      @allowed_services = allowed_services + [
+        :logon_system, :logoff_system,
+        :list_asset_namespace,
+        :create_asset, :get_asset, :set_asset, :destroy_asset
+      ]
     end
 
     def method_missing(service_sym, **args)
+      if not @allowed_services.include? service_sym
+        raise MediaFlux::MFServiceError.new("'#{service_sym}' is not an allowed service")
+      end
       service = service_sym.to_s.split("_").rotate.join(".")
       call(service, **args)
     end
@@ -55,7 +66,7 @@ module MediaFlux
         puts MediaFlux.pretty result if @verbose
         return result
       else
-        raise MediaFlux::MFError("Unexpected response type '#{response_type}'")
+        raise MediaFlux::MFError.new("Unexpected response type '#{response_type}'")
       end
     end
 
