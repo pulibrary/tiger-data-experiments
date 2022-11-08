@@ -35,4 +35,5 @@ jobs:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
         working-directory: homebaked
+    - run: cd homebaked
     - run: bundle exec rspec
