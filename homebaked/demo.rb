@@ -8,7 +8,7 @@ require './mediaflux'
 # Load hash with symbolic keys; Avoid extra Rails dependencies for now: 
 config = YAML.load_file('config.yaml').map { |k, v| [k.to_sym, v] }.to_h
 
-mf = MediaFlux::MFClient.new(verbose: true, **config)
+mf = MediaFlux::MFClient.new(verbose: true, uses: [:query_asset], **config)
 
 
 begin
@@ -34,6 +34,13 @@ mf.session() do
   mf.set_asset id: id, meta: {mf_note: {note: "Hello"}}
 
   mf.get_asset id: {_version: 1, _: id}
+
+  # Returns nothing. From the example of metadata creation and query ...
+  # https://docs.google.com/presentation/d/168Cjz8gXy3ESrPnvjATFpcHrcSNFu2x6/edit#slide=id.p128
+  # https://docs.google.com/presentation/d/168Cjz8gXy3ESrPnvjATFpcHrcSNFu2x6/edit#slide=id.p130
+  # ... I though the metadata root was also a "type", but that doesn't seem to be true.
+  mf.query_asset where: "type='mf-note'"
+  mf.query_asset where: "type='mf-note'", action: "get-value", xpath: {_ename: "note", _: "mf-note/note"} 
 
   mf.destroy_asset id: id
 end

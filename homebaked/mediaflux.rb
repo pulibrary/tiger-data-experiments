@@ -21,7 +21,7 @@ module MediaFlux
 
   class MFClient
     def initialize(
-        verbose: false, allowed_services: [],
+        verbose: false, uses: [],
         mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:)
       @verbose = verbose
       @mf_host = mf_host
@@ -29,7 +29,7 @@ module MediaFlux
       @mf_domain = mf_domain
       @mf_username = mf_username
       @mf_password = mf_password
-      @allowed_services = allowed_services + [
+      @allowed_services = uses + [
         :logon_system, :logoff_system,
         :list_asset_namespace,
         :create_asset, :get_asset, :set_asset, :destroy_asset
