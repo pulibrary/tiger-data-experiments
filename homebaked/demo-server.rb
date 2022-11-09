@@ -37,6 +37,13 @@ mf.session() do
   doc = mf.create_server_tmp_file
   tmp_path = doc.elements['//path']
 
-  # Not sure if this is the way to read or write files, if we needed to do that...
+  # Not sure if this is the way to read or write files, if we needed to do that... Not sure about mount and uid.
   # mf.open_posix_fs_file for: 'read', path: 'path', mount: '/', uid: my_uid
+
+  # 4.13.031, etc.
+  mf.version_server
+  # sleep...
+  mf.wait_server seconds: 1
+  # 1.0
+  mf.version_server_xml
 end
