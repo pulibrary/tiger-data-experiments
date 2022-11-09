@@ -1,0 +1,23 @@
+<service name="asset.owner.set" type="builtin" licenced="true">
+  <description>Changes the owner of an asset. Must be the owner, or have write permission to the asset to change.</description>
+  <execute>local</execute>
+  <definition>
+    <element name="authority" type="string" min-occurs="0" max-occurs="1">
+      <description>The identity of the authority/repository where the user identity originates. If unspecified, then refers to a user in this repository.</description>
+      <attribute name="protocol" type="string" min-occurs="0">
+        <description>The protocol of the identity authority. If unspecified, defaults to federated user within the same type of repository.</description>
+      </attribute>
+    </element>
+    <element name="domain" type="string" max-occurs="1">
+      <description>The name of the domain.</description>
+    </element>
+    <element name="id" type="asset">
+      <description>The path to the asset.</description>
+    </element>
+    <element name="user" type="string" max-occurs="1">
+      <description>The identity of the user.</description>
+    </element>
+  </definition>
+  <access>MODIFY</access>
+  <can-abort>false</can-abort>
+</service>
