@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # call to get a description of a service
 
 require 'nokogiri'
@@ -12,11 +13,11 @@ config = YAML.load_file('config.yaml').transform_keys(&:to_sym)
 https = Net::HTTP.new(config[:mf_host], config[:mf_port])
 https.use_ssl = true
 
-if ARGV.length < 1
-  puts "usage: ruby describe_service.rb [service_name]"
+if ARGV.empty?
+  puts 'usage: ruby describe_service.rb [service_name]'
   exit
 end
- 
+
 session = login(https, config)
 response = build_request(https, session, 'system.service.describe')
 doc = Nokogiri::XML.parse(response.body)
