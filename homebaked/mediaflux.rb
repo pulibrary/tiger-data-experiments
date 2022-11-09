@@ -21,7 +21,7 @@ module MediaFlux
 
   class MFClient
     def initialize(
-        verbose: false, uses: [],
+        verbose: false, uses: [], use_any_service: false,
         mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:)
       @verbose = verbose
       @mf_host = mf_host
@@ -34,10 +34,11 @@ module MediaFlux
         :list_asset_namespace,
         :create_asset, :get_asset, :set_asset, :destroy_asset
       ]
+      @use_any_service = use_any_service
     end
 
     def method_missing(service_sym, **args)
-      if not @allowed_services.include? service_sym
+      if not @allowed_services.include? service_sym and not @use_any_service
         raise MediaFlux::MFServiceError.new("'#{service_sym}' is not an allowed service")
       end
       service = service_sym.to_s.split("_").rotate.join(".")
