@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "net/http"
 require "rexml/document"
 
@@ -13,6 +14,8 @@ module MediaFlux
       @error = reply.elements["error"].text
       @message = reply.elements["message"].text
       @stack = reply.elements["stack"]&.text
+
+      super
     end
   end
 
@@ -20,6 +23,7 @@ module MediaFlux
   end
 
   class MFClient
+    # rubocop:disable Metrics/ParameterLists
     def initialize(
       mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:, verbose: false, allowed_services: []
     )
@@ -34,6 +38,11 @@ module MediaFlux
         list_asset_namespace
         create_asset get_asset set_asset destroy_asset
       ]
+    end
+    # rubocop:enable Metrics/ParameterLists
+
+    def respond_to_missing?(method_name, include_all = false)
+      super(method_name, include_all)
     end
 
     def method_missing(service_sym, **args)
@@ -104,6 +113,9 @@ module MediaFlux
   # - ... unless first charcter is an underscore: then attribute
   # - Underscores in names translated to dashes
   # - Text can be the value, or can use the "_" key, if there are other attributes.
+  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/CyclomaticComplexity
+  # rubocop:disable Metrics/PerceivedComplexity
   def to_xml(hash_or_scalar)
     if hash_or_scalar.class != Hash
       return hash_or_scalar.to_s.encode(xml: :text) if hash_or_scalar.class != REXML::Document
@@ -135,6 +147,9 @@ module MediaFlux
       end
     end.join("")
   end
+  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/CyclomaticComplexity
+  # rubocop:enable Metrics/PerceivedComplexity
 
   def pretty(doc)
     formatter = REXML::Formatters::Pretty.new

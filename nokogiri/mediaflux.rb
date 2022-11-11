@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "net/http"
 require "rexml/document"
 require "nokogiri"
@@ -11,10 +12,13 @@ module MediaFlux
       @error = reply.elements["error"].text
       @message = reply.elements["message"].text
       @stack = reply.elements["stack"]&.text
+
+      super
     end
   end
 
   class MFClient
+    # rubocop:disable Metrics/ParameterLists
     def initialize(
       mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:, verbose: false
     )
@@ -25,6 +29,7 @@ module MediaFlux
       @mf_username = mf_username
       @mf_password = mf_password
     end
+    # rubocop:enable Metrics/ParameterLists
 
     def call(service_name, args_xml)
       puts "\n#{service_name}: #{args_xml}" if @verbose

@@ -21,6 +21,12 @@ Metrics/BlockLength:
     - "config/environments/**/*"
     - "lib/tasks/**/*"
     - "spec/**/*"
+    - "nokogiri/demo.rb"
+
+Metrics/MethodLength:
+  Exclude:
+    - "homebaked/mediaflux.rb"
+    - "nokogiri/mediaflux.rb"
 
 Style/GuardClause:
   Enabled: false

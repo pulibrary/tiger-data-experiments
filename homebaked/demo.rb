@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require "yaml"
 require "byebug"
@@ -13,8 +14,8 @@ mf = MediaFlux::MFClient.new(verbose: true, **config)
 begin
   puts "\nUnknown service:"
   mf.foo_bar
-rescue MediaFlux::MFServiceError => e
-  puts "Error caught!"
+rescue MediaFlux::MFServiceError => service_error
+  puts "Error caught! #{service_error}"
 end
 
 mf.session do
