@@ -22,6 +22,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+    response_body
   end
 
   # Terminates the current session
@@ -32,6 +33,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+    response_body
   end
 
   # Queries for assets on the given namespace
@@ -46,6 +48,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+    response_body
   end
 
   # Fetches metadata for the given asset it
@@ -60,6 +63,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+    response_body
   end
 
   def get_content(id)
@@ -73,6 +77,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request, true)
+    response_body
   end
 
   def set_note(id, mf_note)
@@ -91,6 +96,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+    response_body
   end
 
   # Creates an empty file (no content) with the name provided
@@ -106,6 +112,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+    response_body
   end
 
   # Uploads a file to the given namespace
@@ -125,10 +132,12 @@ class MediaFluxClient
     XML_BODY
     file_content = File.read(filename_fullpath)
     response_body = http_post(xml_request, true, file_content)
+    response_body
   end
 
   private
 
+    # rubocop:disable Metrics/AbcSize
     def http_post(payload, mflux = false, file_content = nil)
       url = @base_url
       uri = URI.parse(url)
@@ -174,6 +183,7 @@ class MediaFluxClient
         response.body
       end
     end
+    # rubocop:enable Metrics/AbcSize
 
     def xml_separator(xml)
       # 01 00 xx xx xx xx xx xx xx xx 00 00 00 01 yy yy

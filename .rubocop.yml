@@ -23,10 +23,15 @@ Metrics/BlockLength:
     - "spec/**/*"
     - "nokogiri/demo.rb"
 
+Metrics/ClassLength:
+  Exclude:
+    - "ruby-hardcoded-api/mfclient.rb"
+
 Metrics/MethodLength:
   Exclude:
     - "homebaked/mediaflux.rb"
     - "nokogiri/mediaflux.rb"
+    - "ruby-hardcoded-api/mfclient.rb"
 
 Style/GuardClause:
   Enabled: false

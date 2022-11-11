@@ -24,3 +24,4 @@ service_description = doc.xpath("response/reply/result/service[@name='#{ARGV[0]}
 puts service_description
 
 response = logoff(https)
+response
