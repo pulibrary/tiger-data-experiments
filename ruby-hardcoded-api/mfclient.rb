@@ -10,7 +10,7 @@ class MediaFluxClient
     @password = password
     @base_url = transport == "https" ? "https://#{host}:443/__mflux_svc__/" : "http://#{host}:80/__mflux_svc__/"
     @xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'
-    connect()
+    connect
   end
 
   # Fetches MediaFlux's server version information (in XML)
@@ -127,6 +127,7 @@ class MediaFluxClient
   end
 
   private
+
     def http_post(payload, mflux = false, file_content = nil)
       url = @base_url
       uri = URI.parse(url)
@@ -165,7 +166,7 @@ class MediaFluxClient
           # Horrible hack to extract the content
           header = response.body[0..23]
           metadata_size = length_from_header(header)
-          start_at = metadata_size + 24 + 24 + 2  # metadata_size + header + header + 2
+          start_at = metadata_size + 24 + 24 + 2 # metadata_size + header + header + 2
           response.body[start_at..]
         end
       else
@@ -194,10 +195,10 @@ class MediaFluxClient
       number_hex = number.to_s(16).rjust(16, "0")
       (0..7).each do |i|
         n = i * 2
-        hex = number_hex[n..n+1]
+        hex = number_hex[n..n + 1]
         hex_bytes << hex.to_i(16).chr
       end
-      hex_bytes.join()
+      hex_bytes.join
     end
 
     # header: "\x01\x00\x00\x00\x00\x00\x00\x00\a\xF7\x00\x00\x00\x01\x00\btext/xml"
@@ -206,12 +207,12 @@ class MediaFluxClient
       hex_str = ""
       data = header[2..9]
       data.each_char do |c|
-        hex_str += c.ord.to_s(16).rjust(2,"0")
+        hex_str += c.ord.to_s(16).rjust(2, "0")
       end
       hex_str.to_i(16)
     end
 
-    def connect()
+    def connect
       xml_request = <<-XML_BODY
         <request>
           <service name="system.logon">

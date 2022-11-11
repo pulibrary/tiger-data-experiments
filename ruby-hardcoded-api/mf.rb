@@ -9,32 +9,31 @@ transport = "https"
 action = ARGV[0] || "help"
 mf = MediaFluxClient.new(host, domain, user, password, transport)
 
-case
-when action == "mf-version"
+if action == "mf-version"
   puts "MediaFlux version"
-  puts mf.version()
-when action == "create"
+  puts mf.version
+elsif action == "create"
   namespace = ARGV[1]
   filename = ARGV[2]
   puts "Create new empty asset #{filename} in namespace #{namespace}"
   puts mf.create(namespace, filename)
-when action == "get-metadata"
+elsif action == "get-metadata"
   id = ARGV[1]
   puts "Metadata for asset id #{id}"
   puts mf.get_metadata(id)
-when action == "get-content"
+elsif action == "get-content"
   id = ARGV[1]
   puts mf.get_content(id)
-when action == "set-note"
+elsif action == "set-note"
   id = ARGV[1]
   note = ARGV[2]
   puts "Changing note for asset id #{id}"
   puts mf.set_note(id, note)
-when action == "query"
+elsif action == "query"
   aql_query = ARGV[1]
   puts "Assets for query #{aql_query}"
   puts mf.query(aql_query)
-when action == "upload"
+elsif action == "upload"
   namespace = ARGV[1]
   filename = ARGV[2]
   puts "Uploads file #{filename} to namespace #{namespace}"
@@ -64,6 +63,4 @@ else
   puts ""
 end
 
-mf.logout()
-
-
+mf.logout

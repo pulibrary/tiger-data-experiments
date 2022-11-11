@@ -4,10 +4,10 @@
 require "yaml"
 require "byebug"
 
-require_relative 'mediaflux'
+require_relative "mediaflux"
 
-# Load hash with symbolic keys; Avoid extra Rails dependencies for now: 
-config = YAML.load_file(__dir__ + '/config.yaml').map { |k, v| [k.to_sym, v] }.to_h
+# Load hash with symbolic keys; Avoid extra Rails dependencies for now:
+config = YAML.load_file(__dir__ + "/config.yaml").map { |k, v| [k.to_sym, v] }.to_h
 
 mf = MediaFlux::MFClient.new(verbose: true, **config)
 
