@@ -12,7 +12,7 @@ config = YAML.load_file("config.yaml").transform_keys(&:to_sym)
 https = Net::HTTP.new(config[:mf_host], config[:mf_port])
 https.use_ssl = true
 
-if ARGV.length < 1
+if ARGV.empty?
   puts "usage: ruby describe_service.rb [service_name]"
   exit
 end
