@@ -66,12 +66,12 @@ module MediaFlux
         xml.password @mf_password
       end
       args_xml = fragment.to_xml
-      result_doc = call('system.logon', args_xml)
-      @session = result_doc.elements['session'].text
+      result_doc = call("system.logon", args_xml)
+      @session = result_doc.elements["session"].text
 
       yield
 
-      call('system.logoff', '')
+      call("system.logoff", "")
     end
 
     private
@@ -92,6 +92,6 @@ module MediaFlux
   def pretty(doc)
     formatter = REXML::Formatters::Pretty.new
     formatter.compact = true
-    formatter.write(doc, '')
+    formatter.write(doc, "")
   end
 end
