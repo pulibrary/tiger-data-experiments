@@ -51,17 +51,22 @@ module MediaFlux
         raise MediaFlux::MFServiceError, "'#{service_sym}' is not an allowed service"
       end
 
+      data_out_max = args.delete('data-out-max')
+      data_out_min = args.delete('data-out-min')
+
       service = service_sym.to_s.split("_").rotate.join(".")
-      call(service, **args)
+      call(service, data_out_max: data_out_max, data_out_min: data_out_min, **args)
     end
 
-    def call(service_name, **args)
+    def call(service_name, data_out_max:, data_out_min:, **args)
       puts "\n#{service_name}: #{args}" if @verbose
       request_xml = MediaFlux.to_xml({
                                        request: {
                                          service: {
                                            _name: service_name,
                                            _session: @session,
+                                           _data_out_max: data_out_max,
+                                           _data_out_min: data_out_min,
                                            args: args
                                          }
                                        }

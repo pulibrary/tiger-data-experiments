@@ -18,6 +18,6 @@ mf.session() do
   mf.describe_type type: type
   # How do we specify outputs? Is this something out of band?
   #   service type.script.create requires 1 outputs(s). Requesting 0..0 output(s)
-  # mf.create_type_script data_out_max: 10, stype: type
+  mf.create_type_script data_out_max: 1, data_out_min: 1, stype: type
   mf.destroy_type type: type
 end
