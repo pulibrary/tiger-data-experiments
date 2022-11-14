@@ -1,15 +1,15 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-require 'yaml'
-require 'byebug'
+require "yaml"
+require "byebug"
 
-require_relative 'mediaflux'
+require_relative "mediaflux"
 
-# Load hash with symbolic keys; Avoid extra Rails dependencies for now: 
-config = YAML.load_file(__dir__ + '/config.yaml').map { |k, v| [k.to_sym, v] }.to_h
+# Load hash with symbolic keys; Avoid extra Rails dependencies for now:
+config = YAML.load_file(__dir__ + "/config.yaml").map { |k, v| [k.to_sym, v] }.to_h
 
 mf = MediaFlux::MFClient.new(verbose: true, **config)
-
 
 begin
   mf.call("foo.bar", "")
@@ -18,7 +18,7 @@ rescue MediaFlux::MFError => e
   puts e.message
 end
 
-mf.session() do
+mf.session do
   doc = mf.call("asset.namespace.list", "")
   doc.elements["//namespace"].each do |el|
     puts el.text
@@ -44,11 +44,11 @@ mf.session() do
   fragment = Nokogiri::XML::DocumentFragment.parse("")
   Nokogiri::XML::Builder.with(fragment) do |xml|
     xml.id id
-    xml.meta {
-      xml.send("mf-note") {
+    xml.meta do
+      xml.send("mf-note") do
         xml.note "Hello"
-      }
-    }
+      end
+    end
   end
   args_xml = fragment.to_xml
   mf.call("asset.set", args_xml)
@@ -69,7 +69,7 @@ mf.session() do
   #     super(dashed_method, *dashed_args)
   #   end
   # end
-  
+
   fragment = Nokogiri::XML::DocumentFragment.parse("")
   Nokogiri::XML::Builder.with(fragment) do |xml|
     xml.id(id, version: 1)

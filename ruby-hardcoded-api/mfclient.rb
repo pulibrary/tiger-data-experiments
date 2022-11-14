@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "net/http"
 require "nokogiri"
 
@@ -10,7 +11,7 @@ class MediaFluxClient
     @password = password
     @base_url = transport == "https" ? "https://#{host}:443/__mflux_svc__/" : "http://#{host}:80/__mflux_svc__/"
     @xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'
-    connect()
+    connect
   end
 
   # Fetches MediaFlux's server version information (in XML)
@@ -21,6 +22,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+    response_body
   end
 
   # Terminates the current session
@@ -31,6 +33,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+    response_body
   end
 
   # Queries for assets on the given namespace
@@ -45,6 +48,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+    response_body
   end
 
   # Fetches metadata for the given asset it
@@ -59,6 +63,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+    response_body
   end
 
   def get_content(id)
@@ -72,6 +77,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request, true)
+    response_body
   end
 
   def set_note(id, mf_note)
@@ -90,6 +96,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+    response_body
   end
 
   # Creates an empty file (no content) with the name provided
@@ -105,6 +112,7 @@ class MediaFluxClient
       </request>
     XML_BODY
     response_body = http_post(xml_request)
+    response_body
   end
 
   # Uploads a file to the given namespace
@@ -124,9 +132,12 @@ class MediaFluxClient
     XML_BODY
     file_content = File.read(filename_fullpath)
     response_body = http_post(xml_request, true, file_content)
+    response_body
   end
 
   private
+
+    # rubocop:disable Metrics/AbcSize
     def http_post(payload, mflux = false, file_content = nil)
       url = @base_url
       uri = URI.parse(url)
@@ -165,13 +176,14 @@ class MediaFluxClient
           # Horrible hack to extract the content
           header = response.body[0..23]
           metadata_size = length_from_header(header)
-          start_at = metadata_size + 24 + 24 + 2  # metadata_size + header + header + 2
+          start_at = metadata_size + 24 + 24 + 2 # metadata_size + header + header + 2
           response.body[start_at..]
         end
       else
         response.body
       end
     end
+    # rubocop:enable Metrics/AbcSize
 
     def xml_separator(xml)
       # 01 00 xx xx xx xx xx xx xx xx 00 00 00 01 yy yy
@@ -194,10 +206,10 @@ class MediaFluxClient
       number_hex = number.to_s(16).rjust(16, "0")
       (0..7).each do |i|
         n = i * 2
-        hex = number_hex[n..n+1]
+        hex = number_hex[n..n + 1]
         hex_bytes << hex.to_i(16).chr
       end
-      hex_bytes.join()
+      hex_bytes.join
     end
 
     # header: "\x01\x00\x00\x00\x00\x00\x00\x00\a\xF7\x00\x00\x00\x01\x00\btext/xml"
@@ -206,12 +218,12 @@ class MediaFluxClient
       hex_str = ""
       data = header[2..9]
       data.each_char do |c|
-        hex_str += c.ord.to_s(16).rjust(2,"0")
+        hex_str += c.ord.to_s(16).rjust(2, "0")
       end
       hex_str.to_i(16)
     end
 
-    def connect()
+    def connect
       xml_request = <<-XML_BODY
         <request>
           <service name="system.logon">

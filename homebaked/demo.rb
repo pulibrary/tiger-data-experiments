@@ -1,24 +1,24 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-require 'yaml'
-require 'byebug'
+require "yaml"
+require "byebug"
 
-require_relative 'mediaflux'
+require_relative "mediaflux"
 
-# Load hash with symbolic keys; Avoid extra Rails dependencies for now: 
-config = YAML.load_file(__dir__ + '/config.yaml').map { |k, v| [k.to_sym, v] }.to_h
+# Load hash with symbolic keys; Avoid extra Rails dependencies for now:
+config = YAML.load_file(__dir__ + "/config.yaml").map { |k, v| [k.to_sym, v] }.to_h
 
 mf = MediaFlux::MFClient.new(verbose: true, **config)
-
 
 begin
   puts "\nUnknown service:"
   mf.foo_bar
-rescue MediaFlux::MFServiceError => e
-  puts "Error caught!"
+rescue MediaFlux::MFServiceError => service_error
+  puts "Error caught! #{service_error}"
 end
 
-mf.session() do
+mf.session do
   doc = mf.list_asset_namespace
   doc.elements["//namespace"].each do |el|
     puts el.text
@@ -31,9 +31,9 @@ mf.session() do
 
   mf.get_asset id: id
 
-  mf.set_asset id: id, meta: {mf_note: {note: "Hello"}}
+  mf.set_asset id: id, meta: { mf_note: { note: "Hello" } }
 
-  mf.get_asset id: {_version: 1, _: id}
+  mf.get_asset id: { _version: 1, _: id }
 
   mf.destroy_asset id: id
 end
