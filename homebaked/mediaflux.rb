@@ -25,9 +25,10 @@ module MediaFlux
   class MFClient
     # rubocop:disable Metrics/ParameterLists
     def initialize(
-      mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:, verbose: false, allowed_services: []
+      mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:, verbose: false, allowed_services: [], allow_any_service: false
     )
       @verbose = verbose
+      @allow_any_service = allow_any_service
       @mf_host = mf_host
       @mf_port = mf_port
       @mf_domain = mf_domain
@@ -46,7 +47,7 @@ module MediaFlux
     end
 
     def method_missing(service_sym, **args)
-      unless @allowed_services.include? service_sym
+      unless @allowed_services.include? service_sym or @allow_any_service
         raise MediaFlux::MFServiceError, "'#{service_sym}' is not an allowed service"
       end
 
@@ -154,6 +155,6 @@ module MediaFlux
   def pretty(doc)
     formatter = REXML::Formatters::Pretty.new
     formatter.compact = true
-    formatter.write(doc, "")
+    formatter.write(doc, +"")
   end
 end
