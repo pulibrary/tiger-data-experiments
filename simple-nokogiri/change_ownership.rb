@@ -10,9 +10,9 @@ config = YAML.load_file('config.yaml').transform_keys(&:to_sym)
 https = Net::HTTP.new(config[:mf_host], config[:mf_port])
 https.use_ssl = true
 
-if ARGV.length < 2
+if ARGV.length != 2
   puts 'usage: ruby change_ownership.rb [id(,id)] [new_owner]'
-  exit
+  exit 1
 end
 
 session = login(https, config)
