@@ -25,19 +25,20 @@ module MediaFlux
   class MFClient
     # rubocop:disable Metrics/ParameterLists
     def initialize(
-      mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:, verbose: false, allowed_services: []
-    )
+        verbose: false, uses: [], use_any_service: false,
+        mf_host:, mf_port:, mf_domain:, mf_username:, mf_password:)
       @verbose = verbose
       @mf_host = mf_host
       @mf_port = mf_port
       @mf_domain = mf_domain
       @mf_username = mf_username
       @mf_password = mf_password
-      @allowed_services = allowed_services + %i[
+      @allowed_services = uses + %i[
         logon_system logoff_system
         list_asset_namespace
         create_asset get_asset set_asset destroy_asset
       ]
+      @use_any_service = use_any_service
     end
     # rubocop:enable Metrics/ParameterLists
 
@@ -46,7 +47,7 @@ module MediaFlux
     end
 
     def method_missing(service_sym, **args)
-      unless @allowed_services.include? service_sym
+      unless @allowed_services.include? service_sym or @use_any_service
         raise MediaFlux::MFServiceError, "'#{service_sym}' is not an allowed service"
       end
 
