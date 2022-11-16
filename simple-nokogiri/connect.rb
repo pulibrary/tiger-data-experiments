@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-def build_request(https, session, name)
+def build_request(https, session, name, form_file=nil)
   args = { name: name }
   args[:session] = session unless session.nil?
   builder = Nokogiri::XML::Builder.new do |xml|
@@ -12,9 +12,17 @@ def build_request(https, session, name)
   end
 
   request = Net::HTTP::Post.new("__mflux_svc__")
-  request.body = builder.to_xml
-  request["Content-Type"] = "text/xml; charset=utf-8"
-
+  if form_file.nil?
+    request["Content-Type"] = "text/xml; charset=utf-8"
+    request.body = builder.to_xml
+  else
+    request["Content-Type"] = 'multipart/form-data'
+    request.set_form({ "request" => builder.to_xml, 
+                   "nb-data-attachments" => "1", 
+                   "file_0" => form_file},
+                   "multipart/form-data",
+                   "charset" => "UTF-8")
+  end  
   https.request(request)
 end
 
