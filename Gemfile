@@ -10,4 +10,6 @@ gem "thor", "~> 1.2"
 group :development, :test do
   gem "bixby", "~> 5.0"
   gem "pry-byebug"
+  gem "rspec"
+  gem "simplecov"
 end
