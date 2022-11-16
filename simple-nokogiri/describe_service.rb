@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # call to get a description of a service
 
 require "nokogiri"
