@@ -16,10 +16,10 @@ ids = ARGV[0].split(',') if ARGV.length >= 1
 
 session = login(https, config)
 puts "\n\n******************** Collections #{ids} *****************\n\n"
-response = build_request(https, session, 'asset.namespace.list') do |xml|
+response = build_request(https, session, 'asset.collection.list') do |xml|
   unless ids.nil?
     xml.args do
-      xml.assets = true
+      xml.assets true
       ids.each { |id| xml.id id }
     end
   end
