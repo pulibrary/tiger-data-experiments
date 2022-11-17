@@ -27,6 +27,10 @@ Metrics/ClassLength:
   Exclude:
     - "ruby-hardcoded-api/mfclient.rb"
 
+Metrics/LineLength:
+  Exclude:
+    - "spec/lib/tiger_data/list_spec.rb"
+
 Metrics/MethodLength:
   Exclude:
     - "homebaked/mediaflux.rb"

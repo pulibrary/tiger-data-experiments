@@ -59,6 +59,8 @@ module TigerData
     # Iterate over the child nodes (this implements the interface for Enumerable)
     # @return [Enumerable]
     def each
+      return nodes.each unless block_given?
+
       nodes.each { |node| yield node }
     end
 

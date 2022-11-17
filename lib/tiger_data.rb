@@ -2,6 +2,7 @@
 
 require "nokogiri"
 require "pry-byebug"
+require "thor"
 
 require(File.join(__dir__, "..", "nokogiri", "mediaflux"))
 
