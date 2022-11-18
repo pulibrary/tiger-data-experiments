@@ -20,7 +20,8 @@ session = login(https, config)
 ids = ARGV[0].split(',')
 metadata_field = ARGV[1]
 metadata_value = ARGV[2]
-
+# Note: Adding metadata to the collection in this way did not propagate to the members. 
+# Maybe I have something not set quite right in the collection, or maybe we need a different update command.
 response = build_request(https, session, 'asset.set') do |xml|
   xml.args do
     ids.each { |id| xml.id id }
