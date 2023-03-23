@@ -38,8 +38,19 @@
 #
 # Be sure to change the value of ROOT below if you run this script multiple times.
 #
+#
+# FETCHING THE DATA FOR AN ORGANIZATION AND/OR PROJECT
+#
+# 3. Inside aterm run
+#
+#   # Get projects inside an organization
+#   asset.query :where "namespace=/td-hector-root-6/pppl" :where "asset is collection" :action get-name
+#
+#   # Get assets/files inside a project
+#   asset.query :where "asset in collection /td-hector-root-6/pppl/project-pppl-1"
+#
 
-set ROOT "td-hector-root-6"
+set ROOT "td-hector-root-7"
 set LOG_NAME "seeddata-2023-03-23"
 
 proc logMessage { message } \
@@ -59,7 +70,7 @@ proc createSampleAssets { namespace project } \
 {
     logMessage "Creating sample assets for ${namespace} {$project}"
     set pid [projectId $namespace $project]
-    asset.test.create :base-name "$project-dyn-" :nb 5 :pid $pid
+    asset.test.create :base-name "$project-file-" :nb 5 :pid $pid
 }
 
 # Create our root namespaces and one namespace per-organization
